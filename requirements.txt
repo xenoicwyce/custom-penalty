@@ -1,0 +1,17 @@
+qiskit
+qiskit_aer
+qiskit_algorithms
+qiskit_optimization
+qiskit_optimization[gurobi]
+qaoalib
+numpy
+scipy
+sympy
+matplotlib
+networkx
+pylatexenc
+ipykernel
+ipympl
+pandas
+seaborn
+tqdm
