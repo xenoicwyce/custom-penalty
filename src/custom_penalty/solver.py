@@ -146,8 +146,7 @@ class CustomPenaltySolver:
 
         return obj_val + sum(constr_vals)
 
-    @staticmethod
-    def filter_counts(counts: dict[str, int]) -> dict[str, int]:
+    def filter_counts(self, counts: dict[str, int]) -> dict[str, int]:
         # threshold is exclusive, i.e. threshold will not be included in the filtered counts.
 
         return {k: v for k, v in counts.items() if (v / sum(counts.values())) > self.filter_count_threshold}
