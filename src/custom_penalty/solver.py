@@ -247,7 +247,7 @@ class CustomPenaltySolver:
     def solve(
         self,
         initial_point: np.ndarray | None = None,
-        sampling_method: str = 'matmul',
+        sampling_method: Literal['fs', 'cvar'] = 'fs',
         optimizer: str = 'powell',
         optimizer_options: dict[str, Any] | None = None,
         cvar_options: dict[str, Any] | None = None,
