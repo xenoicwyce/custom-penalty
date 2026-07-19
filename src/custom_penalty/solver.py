@@ -146,9 +146,11 @@ class CustomPenaltySolver:
 
         return obj_val + sum(constr_vals)
 
-    def filter_counts(self, counts: dict[str, int]) -> dict[str, int]:
+    @staticmethod
+    def filter_counts(counts: dict[str, int]) -> dict[str, int]:
         # threshold is exclusive, i.e. threshold will not be included in the filtered counts.
-        return {k: v for k, v in counts.items() if (v / self.default_shots) > self.filter_count_threshold}
+
+        return {k: v for k, v in counts.items() if (v / sum(counts.values())) > self.filter_count_threshold}
 
     def compute_finite_sampling_loss(self, params) -> float:
         ansatz = self.ansatz.copy()
@@ -251,7 +253,8 @@ class CustomPenaltySolver:
         optimizer: str = 'powell',
         optimizer_options: dict[str, Any] | None = None,
         cvar_options: dict[str, Any] | None = None,
-        filter_count_threshold: float = 0.0,
+        shots: int | None = None,
+        filter_count_threshold: float | None = None,
     ) -> OptimizerResult:
         """
         Calls the Scipy minimize function and returns the OptimizerResult object.
@@ -260,7 +263,10 @@ class CustomPenaltySolver:
           - 'cvar': Computes the CVaR (Conditional Value at Risk) of the given loss function, similar to finite sampling but with loss that only considers
                     a certain percentage of best shots. The parameters can be set by passing `cvar_options`.
         """
-        self.filter_count_threshold = filter_count_threshold
+        if shots is not None:
+            self.default_shots = shots
+        if filter_count_threshold is not None:
+            self.filter_count_threshold = filter_count_threshold
 
         if initial_point is None:
             initial_point = self.generate_random_params()
