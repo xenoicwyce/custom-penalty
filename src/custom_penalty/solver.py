@@ -42,8 +42,12 @@ class CustomPenaltySolver:
         # assume <= 0 satisfies the constraint
         self.penalty_func = (lambda x: np.heaviside(x, 0)) if penalty_func is None else penalty_func
 
+        if ansatz is None:
+            self.set_ansatz(self.default_ansatz(self.num_qubits))
+        else:
+            self.set_ansatz(ansatz)
+
         backend_mps = AerSimulator(method='matrix_product_state')
-        self.ansatz = self.default_ansatz(self.num_qubits) if ansatz is None else ansatz
         self.sampler = BackendSampler(backend=backend_mps) if sampler is None else sampler
         self.default_shots = default_shots
         self.cvar_options = {
@@ -70,8 +74,7 @@ class CustomPenaltySolver:
     def ansatz(self) -> QuantumCircuit:
         return self._ansatz
 
-    @ansatz.setter
-    def ansatz(self, new_ansatz: QuantumCircuit):
+    def set_ansatz(self, new_ansatz: QuantumCircuit):
         if new_ansatz.num_qubits != self.num_qubits:
             raise ValueError(f'The number of qubits in the ansatz must be {self.num_qubits}, got {new_ansatz.num_qubits} instead.')
         self._ansatz = new_ansatz
