@@ -43,7 +43,7 @@ class CustomPenaltySolver:
             penalty_func: Penalty function used to determine constraint violations. The penalty function must
                 assume that the constraint h(x) is satisfied if h(x) <= 0, and violated if h(x) > 0.
                 If None, defaults to a Heaviside step function that penalizes when h(x) > 0.
-            default_shots: Number of shots to use for sampling-based loss evaluation.
+            default_shots: Number of shots used for sampling.
             filter_count_threshold: Minimum probability threshold for keeping sampled counts.
             sampler: Qiskit sampler used to sample the ansatz. Assumed to be a subclass of BaseSamplerV2.
                 If None, defaults to the Qiskit MPS simulator via Qiskit Aer.
@@ -274,12 +274,20 @@ class CustomPenaltySolver:
         shots: int | None = None,
         filter_count_threshold: float | None = None,
     ) -> OptimizerResult:
-        """
-        Calls the Scipy minimize function and returns the OptimizerResult object.
-        Methods available:
-          - 'fs': Finite sampling; evaluates losses classically and multiply by the probability counts obtained.
-          - 'cvar': Computes the CVaR (Conditional Value at Risk) of the given loss function, similar to finite sampling but with loss that only considers
-                    a certain percentage of best shots. The parameters can be set by passing `cvar_options`.
+        """Calls the Scipy minimize function and returns the OptimizerResult object.
+
+        Args:
+            initial_point: Initial point for the optimizer. If None, a random point will be generated.
+            sampling_method: Method for sampling the loss function.
+                Methods available:
+                - 'fs': Finite sampling; evaluates losses classically and multiply by the probability counts obtained.
+                - 'cvar': Computes the CVaR (Conditional Value at Risk) of the given loss function, similar to finite sampling but with loss that only considers
+                            a certain percentage of best shots. The parameters can be set by passing `cvar_options`.
+            optimizer: Scipy local optimizer. Refer to https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html for available optimizers.
+            optimizer_options: Options for the optimizer.
+            cvar_options: Options for the CVaR method.
+            shots: Number of shots to use for sampling.
+            filter_count_threshold: Minimum probability threshold for keeping sampled counts.
         """
         if shots is not None:
             self.default_shots = shots
