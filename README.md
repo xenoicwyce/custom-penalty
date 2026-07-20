@@ -5,12 +5,14 @@ The original work is available at [arXiv:2604.20088](https://arxiv.org/abs/2604.
 # Getting started
 We recommend using `uv` ([installation guide](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1)).
 ```
+uv venv --python 3.12
 uv pip install custom-penalty
 ```
 
 Or you can go with the traditional:
 ```
-python3 -m venv .venv
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install custom-penalty
 ```
 
