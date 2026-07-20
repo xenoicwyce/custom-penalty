@@ -86,7 +86,7 @@ class CustomPenaltySolver:
         self.obj_history: list[float] = []
         self.params_history: list[np.ndarray] = []
 
-        self._min_exp = np.inf
+        self._min_classical_loss = np.inf
 
     @property
     def ansatz(self) -> QuantumCircuit:
@@ -182,19 +182,18 @@ class CustomPenaltySolver:
         counts = result.data.meas.get_counts()
         counts = self.filter_counts(counts)
 
-        expectation = 0
+        fs_loss = 0
         for eigenstate, count in counts.items():
             solution = list(map(int, eigenstate))[::-1] # reverse due to qiskit ordering
-            loss = self.compute_classical_loss(solution)
-            expectation += loss * count
+            classical_loss = self.compute_classical_loss(solution)
+            fs_loss += classical_loss * count
 
-        expectation /= self.default_shots
+            if classical_loss < self._min_classical_loss:
+                self._min_classical_loss = classical_loss
+                self.optimal_solution = solution
 
-        if expectation < self._min_exp:
-            self._min_exp = expectation
-            self.optimal_solution = self.sample_most_likely(counts)
-
-        return expectation
+        fs_loss /= self.default_shots
+        return fs_loss
 
     def compute_cvar_loss(self, params) -> float:
         ansatz = self.ansatz.copy()
