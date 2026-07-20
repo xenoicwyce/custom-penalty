@@ -31,6 +31,24 @@ class CustomPenaltySolver:
         sampler: BaseSamplerV2 | None = None,
         save_params_history: bool = True,
     ):
+        """Initialize the custom-penalty solver with a quadratic program and solver settings.
+
+        Args:
+            quadratic_program: The quadratic program to be solved, with the type of Qiskit QuadraticProgram.
+            ansatz: Parameterized ansatz circuit to be used for optimization. If None, it will default to a
+                RY+CZ ansatz with a single layer and linear entanglement.
+            penalty_mult: Penalty scaling factors for each constraint. The length of the sequence must match
+                the number of constraints in the quadratic program. If None, defaults to a global penalty
+                decided by the upper bound method.
+            penalty_func: Penalty function used to determine constraint violations. The penalty function must
+                assume that the constraint h(x) is satisfied if h(x) <= 0, and violated if h(x) > 0.
+                If None, defaults to a Heaviside step function that penalizes when h(x) > 0.
+            default_shots: Number of shots to use for sampling-based loss evaluation.
+            filter_count_threshold: Minimum probability threshold for keeping sampled counts.
+            sampler: Qiskit sampler used to sample the ansatz. Assumed to be a subclass of BaseSamplerV2.
+                If None, defaults to the Qiskit MPS simulator via Qiskit Aer.
+            save_params_history: Whether to store the parameter history during optimization.
+        """
         self.qp = quadratic_program
         self.num_qubits = self.qp.get_num_binary_vars()
         self.num_constraints = self.qp.get_num_linear_constraints() + self.qp.get_num_quadratic_constraints()
@@ -75,6 +93,7 @@ class CustomPenaltySolver:
         return self._ansatz
 
     def set_ansatz(self, new_ansatz: QuantumCircuit):
+        """ Set the ansatz circuit to be used for optimization."""
         if new_ansatz.num_qubits != self.num_qubits:
             raise ValueError(f'The number of qubits in the ansatz must be {self.num_qubits}, got {new_ansatz.num_qubits} instead.')
         self._ansatz = new_ansatz
@@ -224,9 +243,6 @@ class CustomPenaltySolver:
         return sv
 
     def _sample_optimal_circuit(self) -> dict[str, int]:
-        """
-        Run the full circuit with sampler to get the solution.
-        """
         if self.optimal_params is None:
             raise ValueError(f'Problem not yet solved. Run {type(self).__name__}.solve() to solve the problem.')
 
