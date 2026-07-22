@@ -43,4 +43,4 @@ result = cps.solve()
 print(result)
 ```
 
-For customization and more detailed guide, refer example.ipynb.
+For customization and more detailed guide, refer [example.ipynb](example.ipynb).
